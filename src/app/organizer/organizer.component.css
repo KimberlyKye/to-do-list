@@ -1,0 +1,19 @@
+.new-task {
+  width: 90vw;
+  margin-left: 5vw;
+}
+
+.task {
+  width: 90vw;
+  margin-left: 4vw;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.no-tasks {
+  margin-top: 2vh;
+  text-align: center;
+  font-weight: 500;
+  font-size: medium;
+}

@@ -1,0 +1,65 @@
+<header>
+  <mat-toolbar>
+    <h1>{{ "To-do list" | uppercase }}</h1>
+  </mat-toolbar>
+</header>
+
+<main>
+  <mat-list *ngIf="tasks.length; else noTasks">
+    <mat-list-item *ngFor="let task of tasks">
+      <div class="task">
+        <div>
+          <mat-checkbox></mat-checkbox>
+          {{ task.title }}
+        </div>
+        <div class="task-buttons">
+          <button mat-icon-button color="primary" aria-label="Edit task">
+            <!-- (click)="edit(task)" -->
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            color="warn"
+            aria-label="Delete task"
+            (click)="remove(task)"
+          >
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #noTasks>
+    <p class="no-tasks">No tasks yet...</p>
+  </ng-template>
+</main>
+
+<footer>
+  <form (ngSubmit)="submit()" [formGroup]="form">
+    <mat-form-field class="new-task" appearance="fill">
+      <mat-label>Enter new task</mat-label>
+      <input matInput type="text" formControlName="title" [(ngModel)]="value" />
+      <button
+        matSuffix
+        mat-icon-button
+        aria-label="Add new task"
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        <mat-icon>add_task</mat-icon>
+      </button>
+
+      <button
+        *ngIf="value"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="value = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+</footer>
