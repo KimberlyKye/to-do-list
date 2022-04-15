@@ -9,6 +9,9 @@
   display: flex;
   justify-content: space-between;
   text-align: left;
+  mat-checkbox {
+    padding-right: 1.5vh;
+  }
 }
 
 .no-tasks {

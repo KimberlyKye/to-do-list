@@ -1,27 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { switchMap } from 'rxjs/operators';
-import { DateService } from '../shared/date.service';
-import { Task, TasksService } from '../shared/tasks.service';
+import { Task } from '../model/task';
+import { TasksService } from '../shared/tasks.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-organizer',
   templateUrl: './organizer.component.html',
-  styleUrls: ['./organizer.component.css'],
+  styleUrls: ['./organizer.component.scss'],
 })
 export class OrganizerComponent implements OnInit {
-  value = '';
-  constructor(
-    public dateService: DateService,
-    private tasksService: TasksService
-  ) {}
+  constructor(private tasksService: TasksService) {}
 
   form!: FormGroup;
   tasks: Task[] = [];
+  taskObj : Task = new Task();
+  taskList = new Observable<any>();
+
+  public editingMode: boolean = false;
+
+  addTaskValue : string = '';
+  editTaskValue: string = '';
 
   ngOnInit() {
-    this.dateService.date
-      .pipe(switchMap((value) => this.tasksService.load(value)))
+    this.taskList
+      .pipe(() => this.tasksService.load())
       .subscribe((tasks) => {
         this.tasks = tasks;
       });
@@ -29,32 +32,58 @@ export class OrganizerComponent implements OnInit {
     this.form = new FormGroup({
       title: new FormControl('', Validators.required),
     });
+    this.editTaskValue = '';
+    this.addTaskValue = '';
+    this.taskObj = new Task();
+    this.tasks = [];
+    this.editingMode = false;
+
   }
 
-  submit() {
-    const { title } = this.form.value;
+  addTask() {
+    this.taskObj.title = this.addTaskValue;
+    this.tasksService.create(this.taskObj).subscribe(res => {
+      this.ngOnInit();
+      this.addTaskValue = '';
+    }, err => {
+      alert(err);
+    })
+      console.log(this.addTaskValue);
+  }
 
-    const task: Task = {
-      title,
-      date: this.dateService.date.value.format('DD-MM-YYYY'),
-    };
-    this.tasksService.create(task).subscribe(
-      (task) => {
-        this.tasks.push(task);
-        this.form.reset();
-      },
-      (err) => console.error(err)
-    );
+  editTask() {
+    this.taskObj.title = this.editTaskValue;
+    this.tasksService.change(this.taskObj).subscribe(res => {
+      this.ngOnInit();
+    }, err=> {
+      alert("Failed to update task");
+    })
+  }
 
-    console.log(title);
+  isDone(task: Task) {
+    this.tasksService.change(task).subscribe(res => {
+      this.ngOnInit();
+    }, err=> {
+      alert("Failed to update task");
+    })
   }
 
   remove(task: Task) {
-    this.tasksService.remove(task).subscribe(
-      () => {
-        this.tasks = this.tasks.filter((t) => t.id !== task.id);
-      },
-      (err) => console.error(err)
-    );
+    this.tasksService.remove(task).subscribe(res => {
+      this.ngOnInit();
+    }, err=> {
+      alert("Failed to delete task");
+    });
+  }
+
+  call(task: Task) {
+    this.editingMode = true;
+    this.taskObj = task;
+    this.editTaskValue = task.title;
+  }
+
+  closeEditing() {
+    this.editingMode = false;
+    this.editTaskValue = '';
   }
 }

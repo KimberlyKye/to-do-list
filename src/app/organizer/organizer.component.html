@@ -9,12 +9,20 @@
     <mat-list-item *ngFor="let task of tasks">
       <div class="task">
         <div>
-          <mat-checkbox></mat-checkbox>
+          <mat-checkbox [(ngModel)]="task.isDone"
+           (change)="isDone(task)">
+          </mat-checkbox>
           {{ task.title }}
         </div>
         <div class="task-buttons">
-          <button mat-icon-button color="primary" aria-label="Edit task">
-            <!-- (click)="edit(task)" -->
+          <button
+            mat-icon-button
+            color="accent"
+            aria-label="Edit task"
+            data-bs-toggle="modal"
+            type="button"
+            (click)="call(task)"
+          >
             <mat-icon>edit</mat-icon>
           </button>
 
@@ -30,21 +38,54 @@
       </div>
     </mat-list-item>
   </mat-list>
+
   <ng-template #noTasks>
     <p class="no-tasks">No tasks yet...</p>
   </ng-template>
+
+
+<div *ngIf="editingMode">
+      <mat-form-field class="new-task" appearance="fill" (ngSubmit)="editTask()">
+        <mat-label>Edit Task</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Enter task "
+          name="task"
+          [(ngModel)]="editTaskValue"
+        />
+        <button
+          mat-button
+          aria-label="Edit task"
+          color = "accent"
+          type = "submit"
+          (click)="editTask()"
+          [disabled]="editTaskValue == '' "
+        >
+          Update
+        </button>
+        <button
+          mat-button
+          color="basic"
+          type="button"
+          (click)="closeEditing()"
+        >
+          Close
+        </button>
+      </mat-form-field>
+    </div>
 </main>
 
 <footer>
-  <form (ngSubmit)="submit()" [formGroup]="form">
+  <form (ngSubmit)="addTask()" [formGroup]="form" *ngIf="!editingMode">
     <mat-form-field class="new-task" appearance="fill">
       <mat-label>Enter new task</mat-label>
-      <input matInput type="text" formControlName="title" [(ngModel)]="value" />
+      <input matInput type="text" formControlName="title" [(ngModel)]="addTaskValue" />
       <button
         matSuffix
         mat-icon-button
         aria-label="Add new task"
-        color="primary"
+        color="accent"
         type="submit"
         [disabled]="form.invalid"
       >
@@ -52,11 +93,11 @@
       </button>
 
       <button
-        *ngIf="value"
+        *ngIf="addTaskValue"
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="value = ''"
+        (click)="addTaskValue = ''"
       >
         <mat-icon>close</mat-icon>
       </button>

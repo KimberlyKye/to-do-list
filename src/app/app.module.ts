@@ -5,7 +5,6 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { OrganizerComponent } from './organizer/organizer.component';
-import { MomentPipe } from './shared/moment.pipe';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatListModule } from '@angular/material/list';
@@ -14,10 +13,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
-  declarations: [AppComponent, OrganizerComponent, MomentPipe],
+  declarations: [AppComponent, OrganizerComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -30,7 +29,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatInputModule,
     MatIconModule,
     MatToolbarModule,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
