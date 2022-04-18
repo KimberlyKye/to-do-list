@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Task } from '../model/task';
 import { TasksService } from '../shared/tasks.service';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
+import { v4 as uuidv4 } from  'uuid';
 
 @Component({
   selector: 'app-organizer',
@@ -14,7 +15,7 @@ export class OrganizerComponent implements OnInit {
 
   form!: FormGroup;
   tasks: Task[] = [];
-  taskObj : Task = new Task();
+  task : Task = new Task();
   taskList = new Observable<any>();
 
   public editingMode: boolean = false;
@@ -23,62 +24,63 @@ export class OrganizerComponent implements OnInit {
   editTaskValue: string = '';
 
   ngOnInit() {
-    this.taskList
-      .pipe(() => this.tasksService.load())
-      .subscribe((tasks) => {
-        this.tasks = tasks;
-      });
+    this.loadPage();
+  }
 
+  loadPage() {
+    this.taskList.subscribe(() => this.tasksService.load());
     this.form = new FormGroup({
       title: new FormControl('', Validators.required),
     });
     this.editTaskValue = '';
     this.addTaskValue = '';
-    this.taskObj = new Task();
-    this.tasks = [];
+    this.task = new Task();
     this.editingMode = false;
-
   }
 
   addTask() {
-    this.taskObj.title = this.addTaskValue;
-    this.tasksService.create(this.taskObj).subscribe(res => {
-      this.ngOnInit();
-      this.addTaskValue = '';
+    const task: Task = {
+      id: uuidv4(),
+      title: this.addTaskValue,
+      isDone: false
+    }
+    this.tasksService.create(task).subscribe(task => {
+      this.tasks.push(task);
+      this.loadPage();
     }, err => {
       alert(err);
     })
-      console.log(this.addTaskValue);
   }
 
   editTask() {
-    this.taskObj.title = this.editTaskValue;
-    this.tasksService.change(this.taskObj).subscribe(res => {
-      this.ngOnInit();
-    }, err=> {
+    this.task.title = this.editTaskValue;
+    this.tasksService.change(this.task).subscribe(task => {
+      this.loadPage();
+      take(1)
+    }, err => {
       alert("Failed to update task");
     })
   }
 
   isDone(task: Task) {
-    this.tasksService.change(task).subscribe(res => {
-      this.ngOnInit();
-    }, err=> {
+    this.tasksService.change(task).subscribe(task => {
+      this.loadPage();
+    }, err => {
       alert("Failed to update task");
     })
   }
 
   remove(task: Task) {
-    this.tasksService.remove(task).subscribe(res => {
-      this.ngOnInit();
-    }, err=> {
+    this.tasksService.remove(task).subscribe(task => {
+      this.loadPage();
+    }, err => {
       alert("Failed to delete task");
     });
   }
 
   call(task: Task) {
     this.editingMode = true;
-    this.taskObj = task;
+    this.task = task;
     this.editTaskValue = task.title;
   }
 
