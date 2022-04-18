@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Task } from '../model/task';
 import { TasksService } from '../shared/tasks.service';
-import { Observable, take } from 'rxjs';
-import { v4 as uuidv4 } from  'uuid';
+import { catchError, Observable, take, throwError } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-organizer',
@@ -15,20 +15,22 @@ export class OrganizerComponent implements OnInit {
 
   form!: FormGroup;
   tasks: Task[] = [];
-  task : Task = new Task();
-  taskList = new Observable<any>();
+  task: Task = new Task();
 
-  public editingMode: boolean = false;
+  editingMode: boolean = false;
 
-  addTaskValue : string = '';
+  addTaskValue: string = '';
   editTaskValue: string = '';
 
   ngOnInit() {
     this.loadPage();
   }
 
-  loadPage() {
-    this.taskList.subscribe(() => this.tasksService.load());
+  private loadPage() {
+    this.tasksService
+      .load()
+      .pipe(take(1))
+      .subscribe((tasks) => (this.tasks = tasks));
     this.form = new FormGroup({
       title: new FormControl('', Validators.required),
     });
@@ -42,40 +44,66 @@ export class OrganizerComponent implements OnInit {
     const task: Task = {
       id: uuidv4(),
       title: this.addTaskValue,
-      isDone: false
-    }
-    this.tasksService.create(task).subscribe(task => {
-      this.tasks.push(task);
-      this.loadPage();
-    }, err => {
-      alert(err);
-    })
+      isDone: false,
+    };
+    this.tasksService
+      .create(task)
+      .pipe(
+        take(1),
+        catchError((err) => {
+          alert('Failed to add a task');
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.loadPage();
+      });
   }
 
   editTask() {
     this.task.title = this.editTaskValue;
-    this.tasksService.change(this.task).subscribe(task => {
-      this.loadPage();
-      take(1)
-    }, err => {
-      alert("Failed to update task");
-    })
+    this.tasksService
+      .change(this.task)
+      .pipe(
+        take(1),
+        catchError((err) => {
+          alert('Failed to update task');
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.loadPage();
+      });
   }
 
   isDone(task: Task) {
-    this.tasksService.change(task).subscribe(task => {
-      this.loadPage();
-    }, err => {
-      alert("Failed to update task");
-    })
+    this.tasksService
+      .change(task)
+      .pipe(
+        take(1),
+        catchError((err) => {
+          alert('Failed to update task');
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.loadPage();
+      });
   }
 
   remove(task: Task) {
-    this.tasksService.remove(task).subscribe(task => {
-      this.loadPage();
-    }, err => {
-      alert("Failed to delete task");
-    });
+    this.tasksService
+      .remove(task)
+      .pipe(
+        take(1),
+        catchError((err) => {
+          alert('Failed to delete task');
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.loadPage();
+      });
   }
 
   call(task: Task) {

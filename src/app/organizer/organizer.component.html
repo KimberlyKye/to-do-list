@@ -9,8 +9,7 @@
     <mat-list-item *ngFor="let task of tasks">
       <div class="task">
         <div>
-          <mat-checkbox [(ngModel)]="task.isDone"
-           (change)="isDone(task)">
+          <mat-checkbox [(ngModel)]="task.isDone" (change)="isDone(task)">
           </mat-checkbox>
           {{ task.title }}
         </div>
@@ -43,44 +42,43 @@
     <p class="no-tasks">No tasks yet...</p>
   </ng-template>
 
-
-<div *ngIf="editingMode">
-      <mat-form-field class="new-task" appearance="fill" (ngSubmit)="editTask()">
-        <mat-label>Edit Task</mat-label>
-        <input
-          matInput
-          type="text"
-          placeholder="Enter task "
-          name="task"
-          [(ngModel)]="editTaskValue"
-        />
-        <button
-          mat-button
-          aria-label="Edit task"
-          color = "accent"
-          type = "submit"
-          (click)="editTask()"
-          [disabled]="editTaskValue == '' "
-        >
-          Update
-        </button>
-        <button
-          mat-button
-          color="basic"
-          type="button"
-          (click)="closeEditing()"
-        >
-          Close
-        </button>
-      </mat-form-field>
-    </div>
+  <div *ngIf="editingMode">
+    <mat-form-field class="new-task" appearance="fill" (ngSubmit)="editTask()">
+      <mat-label>Edit Task</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Enter task "
+        name="task"
+        [(ngModel)]="editTaskValue"
+      />
+      <button
+        mat-button
+        aria-label="Edit task"
+        color="accent"
+        type="submit"
+        (click)="editTask()"
+        [disabled]="editTaskValue == ''"
+      >
+        Update
+      </button>
+      <button mat-button color="basic" type="button" (click)="closeEditing()">
+        Close
+      </button>
+    </mat-form-field>
+  </div>
 </main>
 
 <footer>
   <form (ngSubmit)="addTask()" [formGroup]="form" *ngIf="!editingMode">
     <mat-form-field class="new-task" appearance="fill">
       <mat-label>Enter new task</mat-label>
-      <input matInput type="text" formControlName="title" [(ngModel)]="addTaskValue" />
+      <input
+        matInput
+        type="text"
+        formControlName="title"
+        [(ngModel)]="addTaskValue"
+      />
       <button
         matSuffix
         mat-icon-button

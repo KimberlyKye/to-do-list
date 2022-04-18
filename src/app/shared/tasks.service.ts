@@ -12,13 +12,17 @@ export class TasksService {
   constructor(private http: HttpClient) {}
 
   load(): Observable<Task[]> {
-    return this.http.get<Task[]>(`${TasksService.url}/tasks.json`)
-    .pipe(map(tasks => {
-      if (!tasks) {
-        return []
-      }
-      return Object.keys(tasks).map((key: any) => ({...tasks[key], id: key}))
-    }))
+    return this.http.get<Task[]>(`${TasksService.url}/tasks.json`).pipe(
+      map((tasks) => {
+        if (!tasks) {
+          return [];
+        }
+        return Object.keys(tasks).map((key: any) => ({
+          ...tasks[key],
+          id: key,
+        }));
+      })
+    );
   }
 
   create(task: Task): Observable<Task> {
@@ -26,7 +30,10 @@ export class TasksService {
   }
 
   change(task: Task): Observable<Task> {
-    return this.http.put<Task>(`${TasksService.url}/tasks/${task.id}.json`, task);
+    return this.http.put<Task>(
+      `${TasksService.url}/tasks/${task.id}.json`,
+      task
+    );
   }
 
   remove(task: Task): Observable<void> {
